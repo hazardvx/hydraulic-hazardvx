@@ -26,6 +26,7 @@
   font:100%/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none !important}
 html,body{height:100%}
 body{
   background:var(--bg);color:var(--text);
@@ -81,7 +82,14 @@ button{background:none;border:0;cursor:pointer}
   display:grid;place-items:center;
 }
 .nav-item.active .nav-count{background:rgba(255,109,0,.2);color:#FFB370}
-.sidebar-foot{margin-top:auto;padding:10px;font-size:11.5px;color:#5E5E66;line-height:1.5}
+.sidebar-foot{
+  position:fixed;left:14px;bottom:14px;width:208px;z-index:36;
+  display:flex;flex-direction:column;gap:1px;
+  padding:10px 12px;background:rgba(38,38,42,.9);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--line-strong);border-radius:14px;
+  box-shadow:0 10px 28px rgba(0,0,0,.45);
+}
 
 .main{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:26px 30px 60px;position:relative}
 .view{display:none;max-width:1080px;margin:0 auto}
@@ -387,9 +395,20 @@ select option{background:#1D1D20;color:#F5F5F7}
     flex-direction:row;padding:8px 8px calc(8px + env(safe-area-inset-bottom));
     border-right:0;border-top:1px solid var(--line);gap:4px;
   }
-  .brand,.nav-label,.sidebar-foot{display:none}
-  .nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;flex:1}
-  .nav-item{flex-direction:column;gap:3px;padding:8px 2px;font-size:10.5px;border-radius:12px;align-items:center;text-align:center;position:relative;white-space:nowrap;min-width:0;overflow:hidden}
+  .brand,.nav-label{display:none}
+  .nav{display:flex;flex-direction:row;gap:3px;flex:1;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
+  .nav::-webkit-scrollbar{display:none}
+  .nav-item{flex:1 1 auto;min-width:76px;flex-direction:column;gap:3px;padding:8px 4px;font-size:10.5px;border-radius:12px;align-items:center;text-align:center;position:relative;white-space:nowrap;overflow:hidden}
+  .sidebar-foot:not([hidden]){
+    position:fixed;top:10px;right:12px;left:auto;bottom:auto;width:auto;z-index:36;margin:0;padding:7px 9px;
+    flex-direction:row;align-items:center;gap:9px;
+    background:rgba(38,38,42,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    border:1px solid var(--line-strong);border-radius:999px;
+    box-shadow:0 8px 24px rgba(0,0,0,.45);
+  }
+  .sidebar-foot .uf-role{display:none}
+  .sidebar-foot .uf-name{font-size:12px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #btnLogout{margin-top:0;width:auto;height:28px;padding:0 11px;font-size:12px;border-radius:999px}
   .nav-count{position:absolute;top:4px;right:calc(50% - 24px);margin:0;height:16px;min-width:16px;font-size:9.5px;padding:0 4px}
   .main{order:1;padding:18px 15px 30px}
   .head{align-items:flex-start;flex-direction:column;gap:12px}
@@ -430,11 +449,65 @@ select option{background:#1D1D20;color:#F5F5F7}
   .scrim{background:rgba(0,0,0,.75);backdrop-filter:none}
 }
 
+/* ---------- descuento / resumen ---------- */
+.disc-row{display:flex;gap:10px;align-items:center}
+.disc-row .seg{width:188px;flex:0 0 auto}
+.disc-row .input{flex:1}
+.seg[data-v="pct"] .seg-pill{transform:translateX(calc(100% + 4px))}
+.seg.three .seg-pill{width:calc((100% - 8px)/3)}
+.seg.three[data-v="vendedor"] .seg-pill{transform:translateX(calc(100% + 4px))}
+.seg.three[data-v="contador"] .seg-pill{transform:translateX(calc(200% + 8px))}
+.sums-mini{margin-top:14px;display:flex;flex-direction:column;gap:7px;padding:0 3px}
+.sums-mini div{display:flex;justify-content:space-between;font-size:13.5px;color:var(--dim)}
+.sums-mini b{font-variant-numeric:tabular-nums;color:#C7C7CE}
+.sums-mini .disc b,.sums-mini .disc span{color:#FFB370}
+
+/* ---------- roles / saldos ---------- */
+.role-chip{font-size:11px;font-weight:750;padding:4px 10px;border-radius:999px;letter-spacing:.03em}
+.role-chip.admin{background:rgba(255,109,0,.16);color:#FFB370}
+.role-chip.vendedor{background:rgba(10,132,255,.16);color:#6CB5FF}
+.role-chip.contador{background:rgba(192,132,252,.15);color:#CFA8FF}
+.doc-total small{display:block;font-size:11.5px;color:#77777F;font-weight:550;margin-top:2px;letter-spacing:.01em}
+.doc-total small.saldo{color:#FFB340}
+.pay-note{font-size:12.5px;color:var(--dim);margin-top:2px}
+
+/* ---------- usuario (sidebar) ---------- */
+.uf-name{font-size:13px;font-weight:650;color:#C7C7CE}
+.uf-role{font-size:11px;color:#77777F;letter-spacing:.02em}
+#btnLogout{margin-top:10px;width:100%}
+
+/* ---------- login ---------- */
+.login{
+  position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:20px;
+  background:rgba(11,11,12,.72);
+  backdrop-filter:blur(30px) saturate(160%);-webkit-backdrop-filter:blur(30px) saturate(160%);
+  opacity:0;pointer-events:none;transition:opacity .3s ease;
+}
+.login.on{opacity:1;pointer-events:auto}
+.login-card{
+  width:min(400px,100%);background:var(--surface-2);border:1px solid var(--line-strong);
+  border-radius:22px;padding:30px 26px 24px;text-align:center;
+  box-shadow:0 34px 80px rgba(0,0,0,.6);
+  transform:scale(.96);transition:transform .42s var(--sheet-ease);
+}
+.login.on .login-card{transform:scale(1)}
+.login .brand-mark{width:56px;height:56px;border-radius:16px;font-size:26px;margin:0 auto 14px}
+.login h2{font-size:20px;font-weight:750;letter-spacing:-.02em}
+.login .sub{margin-top:4px;margin-bottom:20px}
+.login .field{text-align:left;margin-bottom:13px}
+.login .field .input{height:46px}
+.login-err{display:none;font-size:12.5px;color:#FF6459;margin:-4px 0 10px;text-align:left}
+.login-err.on{display:block;animation:shake .35s ease}
+@keyframes shake{10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+.login-hint{margin-top:14px;font-size:11.5px;color:#6E6E76;line-height:1.7}
+.login-hint code{font-family:ui-monospace,Menlo,monospace;color:#9A9AA2;background:rgba(255,255,255,.06);padding:1px 6px;border-radius:6px}
+.login .btn{width:100%;height:46px}
+
 /* ---------- print ---------- */
 @media print{
   @page{margin:0}
   body{overflow:visible;background:#fff}
-  .app,.scrim,.toast,.sheet-head,.sheet-foot{display:none !important}
+  .app,.scrim,.toast,.login,.sidebar-foot,.sheet-head,.sheet-foot{display:none !important}
   .sheet{display:none !important}
   .sheet.on{
     display:block !important;position:static;transform:none !important;
@@ -461,25 +534,37 @@ select option{background:#1D1D20;color:#F5F5F7}
       </div>
     </div>
 
-    <div class="nav-label">Módulos</div>
+    <div class="nav-label" data-roles="admin,vendedor,contador">Ventas</div>
     <nav class="nav">
-      <button class="nav-item active" data-view="inventario">
+      <button class="nav-item active" data-view="inventario" data-roles="admin,vendedor">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96L12 12.01l8.73-5.05M12 22.08V12"/></svg>
         Inventario <span class="nav-count" id="cProd">0</span>
       </button>
-      <button class="nav-item" data-view="cotizaciones">
+      <button class="nav-item" data-view="cotizaciones" data-roles="admin,vendedor">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>
         Cotizaciones <span class="nav-count" id="cQuote">0</span>
       </button>
-      <button class="nav-item" data-view="facturacion">
+      <button class="nav-item" data-view="facturacion" data-roles="admin,vendedor,contador">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
         Facturación <span class="nav-count" id="cInv">0</span>
       </button>
-    </nav>
 
-    <div class="sidebar-foot">
-      Prototipo v1 ·<br>Los datos se guardan en este equipo.
-    </div>
+      <div class="nav-label" data-roles="admin,contador">Contabilidad</div>
+      <button class="nav-item" data-view="cobrar" data-roles="admin,contador">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/></svg>
+        Por Cobrar <span class="nav-count" id="cCobrar">0</span>
+      </button>
+      <button class="nav-item" data-view="pagar" data-roles="admin,contador">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        Por Pagar <span class="nav-count" id="cPagar">0</span>
+      </button>
+
+      <div class="nav-label" data-roles="admin">Administración</div>
+      <button class="nav-item" data-view="usuarios" data-roles="admin">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Usuarios <span class="nav-count" id="cUsers">0</span>
+      </button>
+    </nav>
   </aside>
 
   <!-- ============ MAIN ============ -->
@@ -510,7 +595,7 @@ select option{background:#1D1D20;color:#F5F5F7}
             <thead>
               <tr>
                 <th>Código</th><th>Producto / Servicio</th><th>Categoría</th>
-                <th>Stock</th><th>Tipo</th><th style="text-align:right">Precio</th><th></th>
+                <th>Cantidad</th><th>Tipo</th><th style="text-align:right">Precio</th><th></th>
               </tr>
             </thead>
             <tbody id="tbodyProducts"></tbody>
@@ -579,7 +664,94 @@ select option{background:#1D1D20;color:#F5F5F7}
       <div class="panel" id="listInvoices"></div>
     </section>
 
+    <!-- ===== CUENTAS POR COBRAR ===== -->
+    <section class="view" id="view-cobrar">
+      <div class="head">
+        <div>
+          <h1 class="h1">Cuentas por Cobrar</h1>
+          <div class="sub">Facturas pendientes de cobrar a clientes</div>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-ghost" id="btnCobrarToggle">Ver todas</button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-k">Por cobrar</div><div class="stat-v accent" id="sCobrar">$0.00</div></div>
+        <div class="stat"><div class="stat-k">Facturas pendientes</div><div class="stat-v" id="sCobrarN">0</div></div>
+        <div class="stat"><div class="stat-k">Cobrado histórico</div><div class="stat-v" id="sCobrado" style="color:#4CDB77">$0.00</div></div>
+      </div>
+
+      <div class="panel" id="listCobrar"></div>
+    </section>
+
+    <!-- ===== CUENTAS POR PAGAR ===== -->
+    <section class="view" id="view-pagar">
+      <div class="head">
+        <div>
+          <h1 class="h1">Cuentas por Pagar</h1>
+          <div class="sub">Deudas con proveedores y servicios</div>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-ghost" id="btnPagarToggle">Ver todas</button>
+          <button class="btn btn-primary" id="btnNewPayable">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Agregar Cuenta
+          </button>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="stat-k">Por pagar</div><div class="stat-v accent" id="sPagar">$0.00</div></div>
+        <div class="stat"><div class="stat-k">Cuentas pendientes</div><div class="stat-v" id="sPagarN">0</div></div>
+        <div class="stat"><div class="stat-k">Pagado histórico</div><div class="stat-v" id="sPagado" style="color:#4CDB77">$0.00</div></div>
+      </div>
+
+      <div class="panel" id="listPagar"></div>
+    </section>
+
+    <!-- ===== USUARIOS ===== -->
+    <section class="view" id="view-usuarios">
+      <div class="head">
+        <div>
+          <h1 class="h1">Usuarios</h1>
+          <div class="sub">Cuentas y permisos del sistema</div>
+        </div>
+        <div class="head-actions">
+          <button class="btn btn-primary" id="btnAddUser">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Agregar Usuario
+          </button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Nombre</th><th>Usuario</th><th>Rol</th><th style="text-align:right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyUsers"></tbody>
+          </table>
+        </div>
+        <div class="empty" id="emptyUsers" hidden>
+          <div class="empty-ico">👥</div>
+          <b>Sin usuarios</b>
+          Pulsa “Agregar Usuario” para crear el primero.
+        </div>
+      </div>
+    </section>
+
   </main>
+</div>
+
+<!-- Chip de usuario (fuera del sidebar: su backdrop-filter rompería el position:fixed) -->
+<div class="sidebar-foot" id="userChip" hidden>
+  <span class="uf-name" id="ufName"></span>
+  <span class="uf-role" id="ufRole"></span>
+  <button class="btn btn-ghost btn-sm" id="btnLogout">Salir</button>
 </div>
 
 <!-- ============ SCRIM + SHEETS ============ -->
@@ -619,7 +791,7 @@ select option{background:#1D1D20;color:#F5F5F7}
       </div>
       <div class="grid2">
         <div class="field">
-          <label for="fStock">Stock / Cantidad</label>
+          <label for="fStock">Cantidad</label>
           <input class="input" id="fStock" type="number" min="0" step="1" value="0" inputmode="numeric">
         </div>
         <div class="field">
@@ -660,6 +832,8 @@ select option{background:#1D1D20;color:#F5F5F7}
         <div class="err-msg" id="eClient">Escribe el nombre del cliente.</div>
       </div>
 
+      <div class="stock-warn" id="clientWarn" hidden></div>
+
       <div class="empty" id="noProducts" hidden style="padding:30px 12px">
         <div class="empty-ico">📦</div>
         <b>No hay productos en el inventario</b>
@@ -678,6 +852,23 @@ select option{background:#1D1D20;color:#F5F5F7}
       </div>
 
       <div class="stock-warn" id="stockWarn" hidden></div>
+
+      <div class="field" id="discField">
+        <label>Descuento al cliente</label>
+        <div class="disc-row">
+          <div class="seg two" id="segDisc" data-v="amount">
+            <div class="seg-pill"></div>
+            <button type="button" data-val="amount" class="on">Monto</button>
+            <button type="button" data-val="pct">Porcentaje</button>
+          </div>
+          <input class="input" id="dDisc" type="number" min="0" step="1" value="0" inputmode="decimal" placeholder="0">
+        </div>
+      </div>
+
+      <div class="sums-mini">
+        <div><span>Subtotal</span><b id="docSub">$0.00</b></div>
+        <div class="disc" id="discRow" hidden><span>Descuento</span><b id="docDisc">–$0.00</b></div>
+      </div>
 
       <div class="total-bar">
         <span>Total</span>
@@ -715,8 +906,138 @@ select option{background:#1D1D20;color:#F5F5F7}
 <!-- Picker menu (estilo Apple) -->
 <div class="picker-menu" id="pickerMenu" role="listbox" hidden></div>
 
+<!-- Abono (cobrar / pagar) -->
+<div class="sheet" id="sheetPayment" role="dialog" aria-modal="true" aria-labelledby="payTitle">
+  <div class="sheet-shell">
+    <div class="sheet-head">
+      <div class="sheet-title" id="payTitle">Registrar abono</div>
+      <button class="icon-btn" data-close aria-label="Cerrar">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="field">
+        <label for="payAmt">Monto del abono ($)</label>
+        <input class="input" id="payAmt" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal">
+        <div class="err-msg" id="ePay">Ingresa un monto válido.</div>
+      </div>
+      <div class="pay-note" id="payHint"></div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-ghost" data-close>Cancelar</button>
+      <button class="btn btn-primary" id="btnPaySave">Abonar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Nueva cuenta por pagar -->
+<div class="sheet" id="sheetPayable" role="dialog" aria-modal="true" aria-labelledby="spayTitle">
+  <div class="sheet-shell">
+    <div class="sheet-head">
+      <div class="sheet-title" id="spayTitle">Agregar Cuenta por Pagar</div>
+      <button class="icon-btn" data-close aria-label="Cerrar">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="field">
+        <label for="pProv">Proveedor</label>
+        <input class="input" id="pProv" placeholder="Ej. Hidráulicas del Sur" autocomplete="off">
+        <div class="err-msg" id="eProv">Escribe el proveedor.</div>
+      </div>
+      <div class="field">
+        <label for="pConcept">Concepto</label>
+        <input class="input" id="pConcept" placeholder="Ej. Compra de mangueras 3/4&quot;" autocomplete="off">
+        <div class="err-msg" id="eConcept">Escribe el concepto.</div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="pTotal">Monto ($)</label>
+          <input class="input" id="pTotal" type="number" min="0" step="0.01" placeholder="0.00" inputmode="decimal">
+          <div class="err-msg" id="ePTotal">Ingresa un monto válido.</div>
+        </div>
+        <div class="field">
+          <label for="pDate">Fecha</label>
+          <input class="input" id="pDate" type="date">
+        </div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-ghost" data-close>Cancelar</button>
+      <button class="btn btn-primary" id="btnSavePayable">Guardar Cuenta</button>
+    </div>
+  </div>
+</div>
+
+<!-- Usuario -->
+<div class="sheet" id="sheetUser" role="dialog" aria-modal="true" aria-labelledby="suTitle">
+  <div class="sheet-shell">
+    <div class="sheet-head">
+      <div class="sheet-title" id="suTitle">Agregar Usuario</div>
+      <button class="icon-btn" data-close aria-label="Cerrar">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="sheet-body">
+      <div class="field">
+        <label for="uName">Nombre completo</label>
+        <input class="input" id="uName" placeholder="Ej. Javier Hernández" autocomplete="off">
+        <div class="err-msg" id="euName">Escribe el nombre.</div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="uUser">Usuario</label>
+          <input class="input" id="uUser" placeholder="Ej. javier" autocomplete="off">
+          <div class="err-msg" id="euUser">Escribe un usuario (mín. 3 caracteres).</div>
+        </div>
+        <div class="field">
+          <label for="uPass">Contraseña</label>
+          <input class="input" id="uPass" type="password" placeholder="••••••" autocomplete="new-password">
+          <div class="err-msg" id="euPass">Escribe una contraseña (mín. 4 caracteres).</div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Rol</label>
+        <div class="seg three" id="segRole" data-v="vendedor">
+          <div class="seg-pill"></div>
+          <button type="button" data-val="admin">Admin</button>
+          <button type="button" data-val="vendedor" class="on">Vendedor</button>
+          <button type="button" data-val="contador">Contador</button>
+        </div>
+        <div class="pay-note" id="roleHint">Vendedor: inventario, cotizaciones y facturación.</div>
+      </div>
+    </div>
+    <div class="sheet-foot">
+      <button class="btn btn-ghost" data-close>Cancelar</button>
+      <button class="btn btn-primary" id="btnSaveUser">Guardar Usuario</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div class="toast" id="toast"><span class="dot"></span><span id="toastMsg"></span></div>
+
+<!-- Login -->
+<div class="login" id="loginScreen">
+  <div class="login-card">
+    <div class="brand-mark">J</div>
+    <h2>JTAS Hydraulic Hose</h2>
+    <div class="sub">Inicia sesión para continuar</div>
+    <div class="field">
+      <label for="lUser">Usuario</label>
+      <input class="input" id="lUser" autocomplete="username" placeholder="Tu usuario">
+    </div>
+    <div class="field">
+      <label for="lPass">Contraseña</label>
+      <input class="input" id="lPass" type="password" autocomplete="current-password" placeholder="••••••••">
+    </div>
+    <div class="login-err" id="lErr">Usuario o contraseña incorrectos.</div>
+    <button class="btn btn-primary" id="btnLogin">Entrar</button>
+    <div class="login-hint">Usuarios de prueba:<br>
+      <code>admin</code>/<code>admin</code> · <code>vendedor</code>/<code>vendedor</code> · <code>contador</code>/<code>contador</code>
+    </div>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -742,7 +1063,8 @@ function seed(){
     quotes:[
       {id:uid(),folio:"COT-0001",client:"Refacciones El Centauro",date:now-2*d,
        items:[{pid:idM,name:'Manguera 1/2" por pie',unit:25,type:"pies",qty:40},
-              {pid:idA,name:"Acople Estándar 1/2\"",unit:45,type:"unidades",qty:6}]}
+              {pid:idA,name:"Acople Estándar 1/2\"",unit:45,type:"unidades",qty:6}],
+       disc:{type:"pct",value:10}}
     ],
     invoices:[
       {id:uid(),folio:"FAC-0001",client:"Taller Hermanos Ruiz",date:now-5*d,status:"PENDIENTE",
@@ -751,16 +1073,42 @@ function seed(){
       {id:uid(),folio:"FAC-0002",client:"Maquinaria del Norte",date:now-12*d,status:"PAGADA",
        items:[{pid:null,name:'Manguera 1/2" por pie',unit:25,type:"pies",qty:80}]}
     ],
+    payables:[
+      {id:uid(),provider:"Hidráulicas del Sur",concept:"Compra de mangueras 3/4\"",date:now-3*d,total:4200,status:"PENDIENTE",payments:[]},
+      {id:uid(),provider:"Ferretera El Yunque",concept:"Acoples y terminales",date:now-20*d,total:1850,status:"PAGADA",
+       payments:[{amount:1850,date:now-15*d}]}
+    ],
+    users: defaultUsers(),
     seq:{q:1,i:2}
   };
+}
+function defaultUsers(){
+  return [
+    {id:"u-admin",name:"Administrador",user:"admin",pass:"admin",role:"admin"},
+    {id:"u-vend",name:"Vendedor",user:"vendedor",pass:"vendedor",role:"vendedor"},
+    {id:"u-cont",name:"Contador",user:"contador",pass:"contador",role:"contador"}
+  ];
 }
 let S;
 try{ S = JSON.parse(localStorage.getItem(KEY)) || seed(); }catch(e){ S = seed(); }
 if(!S.products) S = seed();
+S.payables = Array.isArray(S.payables) ? S.payables : [];
+S.users = (Array.isArray(S.users) && S.users.length) ? S.users : defaultUsers();
 const save = () => localStorage.setItem(KEY, JSON.stringify(S));
 
 const round2 = n => Math.round((n+Number.EPSILON)*100)/100;
-const total = doc => round2((doc.items||[]).reduce((a,it)=>a+it.unit*it.qty,0));
+const subtotal = doc => round2((doc.items||[]).reduce((a,it)=>a+it.unit*it.qty,0));
+function discAmt(doc){
+  const d = doc.disc;
+  if(!d || !(d.value>0)) return 0;
+  const s = subtotal(doc), v = +d.value;
+  const a = d.type==="pct" ? s*v/100 : v;
+  return round2(Math.min(Math.max(a,0), s));
+}
+const total = doc => round2(subtotal(doc) - discAmt(doc));
+const paySum = arr => round2((arr||[]).reduce((a,p)=>a+(+p.amount||0),0));
+const saldoOf = inv => inv.status==="PAGADA" ? 0 : Math.max(0, round2(total(inv) - paySum(inv.payments)));
+const saldoPay = p => p.status==="PAGADA" ? 0 : Math.max(0, round2((+p.total||0) - paySum(p.payments)));
 const nextFolio = k => { S.seq[k] = (S.seq[k]||0)+1; const n = S.seq[k];
   return (k==="q"?"COT-":"FAC-") + String(n).padStart(4,"0"); };
 
@@ -773,14 +1121,43 @@ function applyStock(items, sign){
   }
 }
 
-/* ================= NAV ================= */
+/* ================= NAV / ROLES ================= */
+const ROLE_VIEWS = {
+  admin:["inventario","cotizaciones","facturacion","cobrar","pagar","usuarios"],
+  vendedor:["inventario","cotizaciones","facturacion"],
+  contador:["facturacion","cobrar","pagar"]
+};
+const ROLE_LABEL = {admin:"Administrador", vendedor:"Vendedor", contador:"Contador"};
+const ROLE_HINT = {
+  admin:"Admin: acceso completo a todos los módulos.",
+  vendedor:"Vendedor: inventario, cotizaciones y facturación.",
+  contador:"Contador: facturación y cuentas por cobrar / pagar."
+};
+let me = null;
+
 function go(view){
+  if(me){
+    const allowed = ROLE_VIEWS[me.role] || [];
+    if(!allowed.includes(view)) view = allowed[0];
+  }
   $$(".nav-item").forEach(b=>b.classList.toggle("active", b.dataset.view===view));
   $$(".view").forEach(v=>v.classList.toggle("on", v.id==="view-"+view));
   $(".main").scrollTop = 0;
   if(typeof syncHash === "function") syncHash(view);
 }
 $$(".nav-item").forEach(b=>b.addEventListener("click",()=>go(b.dataset.view)));
+
+function applyRole(){
+  const allowed = ROLE_VIEWS[me.role] || [];
+  $$(".nav-item,.nav-label").forEach(el=>{
+    el.hidden = !(el.dataset.roles||"").split(",").includes(me.role);
+  });
+  $("#ufName").textContent = me.name;
+  $("#ufRole").textContent = ROLE_LABEL[me.role] || me.role;
+  $("#userChip").hidden = false;
+  const hashView = location.hash.replace("#","");
+  go(allowed.includes(hashView) ? hashView : allowed[0]);
+}
 
 /* ================= SHEETS ================= */
 let openSheetEl = null, lastFocus = null;
@@ -933,11 +1310,19 @@ function openDoc(mode){
   $("#dClient").value = "";
   lines = [];
   addLine();
+  discType = "amount";
+  $("#segDisc").dataset.v = "amount";
+  $$("#segDisc button").forEach(x=>x.classList.toggle("on", x.dataset.val==="amount"));
+  $("#dDisc").value = 0;
   const noInv = S.products.length===0;
   $("#noProducts").hidden = !noInv;
   $("#linesField").hidden = noInv;
   $(".total-bar").style.display = noInv ? "none" : "";
+  $("#discField").style.display = noInv ? "none" : "";
+  $(".sums-mini").style.display = noInv ? "none" : "";
+  $("#clientWarn").hidden = true;
   clearErr("dClient","eClient"); $("#eLines").classList.remove("on");
+  updateClientWarn();
   openSheet($("#sheetDoc"));
 }
 $("#btnGoInv").addEventListener("click", ()=>{ closeSheet(); go("inventario"); });
@@ -945,7 +1330,33 @@ $("#btnNewQuote").addEventListener("click",()=>openDoc("quote"));
 $("#btnNewInvoice").addEventListener("click",()=>openDoc("invoice"));
 
 let lines = [];
+let discType = "amount";
 const unitLabel = t => t==="pies" ? "pies" : "ud";
+
+/* descuento: seg $ / % + monto */
+$$("#segDisc button").forEach(b=>b.addEventListener("click",()=>{
+  discType = b.dataset.val;
+  $("#segDisc").dataset.v = discType;
+  $$("#segDisc button").forEach(x=>x.classList.toggle("on", x===b));
+  updTotal();
+}));
+$("#dDisc").addEventListener("input", updTotal);
+
+/* aviso: cliente con saldo pendiente (solo al facturar) */
+function updateClientWarn(){
+  const el = $("#clientWarn");
+  if(docMode!=="invoice"){ el.hidden = true; return; }
+  const name = $("#dClient").value.trim().toLowerCase();
+  if(!name){ el.hidden = true; return; }
+  const pend = S.invoices.filter(i=>i.status!=="PAGADA" && (i.client||"").trim().toLowerCase()===name && saldoOf(i)>0);
+  if(!pend.length){ el.hidden = true; return; }
+  const saldo = round2(pend.reduce((a,i)=>a+saldoOf(i),0));
+  el.innerHTML = "<b>Este cliente ya debe "+money(saldo)+"</b> · "+pend.length+
+    " factura"+(pend.length>1?"s":"")+" pendiente"+(pend.length>1?"s":"")+
+    "<span>Figurará en Cuentas por Cobrar hasta liquidarse.</span>";
+  el.hidden = false;
+}
+$("#dClient").addEventListener("input", updateClientWarn);
 
 function addLine(){
   lines.push({pid: S.products[0]?.id || null, qty:1});
@@ -968,7 +1379,7 @@ function openPicker(btn, idx){
     <button type="button" class="picker-item ${p.id===ln.pid?"on":""}" data-pid="${p.id}" role="option" aria-selected="${p.id===ln.pid}">
       <span class="picker-info">
         <span class="picker-name">${esc(p.name)}</span>
-        <span class="picker-meta">${money(p.price)} por ${unitLabel(p.type)} · stock ${p.stock}</span>
+        <span class="picker-meta">${money(p.price)} por ${unitLabel(p.type)} · cantidad ${p.stock}</span>
       </span>
       <svg class="picker-check" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
     </button>`).join("");
@@ -1031,7 +1442,7 @@ function renderLines(){
       <button class="icon-btn danger" data-act="rm" aria-label="Quitar">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
-      ${p?`<div class="line-hint">${money(p.price)} por ${unitLabel(p.type)} · stock ${p.stock} ${unitLabel(p.type)}</div>`:""}
+      ${p?`<div class="line-hint">${money(p.price)} por ${unitLabel(p.type)} · cantidad ${p.stock} ${unitLabel(p.type)}</div>`:""}
     </div>`;
   }).join("");
 
@@ -1055,11 +1466,16 @@ function renderLines(){
   updTotal();
 }
 function updTotal(){
-  const t = lines.reduce((a,ln)=>{
+  const sub = round2(lines.reduce((a,ln)=>{
     const p = S.products.find(x=>x.id===ln.pid);
     return round2(a + (p ? p.price*(Math.max(0,parseFloat(ln.qty)||0)) : 0));
-  },0);
-  $("#docTotal").textContent = money(t);
+  },0));
+  const dv = Math.max(0, parseFloat($("#dDisc")?.value)||0);
+  const disc = round2(discType==="pct" ? sub*Math.min(dv,100)/100 : Math.min(dv, sub));
+  $("#docSub").textContent = money(sub);
+  $("#docDisc").textContent = "–"+money(disc);
+  $("#discRow").hidden = disc<=0;
+  $("#docTotal").textContent = money(round2(sub-disc));
   checkStock();
 }
 function checkStock(){
@@ -1069,11 +1485,11 @@ function checkStock(){
   for(const ln of lines){
     const p = S.products.find(x=>x.id===ln.pid);
     const q = Math.max(0, parseFloat(ln.qty)||0);
-    if(p && q>p.stock) bad.push(esc(p.name)+" — stock "+p.stock+", pide "+q);
+    if(p && q>p.stock) bad.push(esc(p.name)+" — cantidad "+p.stock+", pide "+q);
   }
   if(!bad.length){ el.hidden = true; return; }
-  el.innerHTML = "<b>Stock insuficiente:</b> "+bad.join(" · ")+
-    "<span>Se emitirá de todas formas; ese producto quedará en 0.</span>";
+  el.innerHTML = "<b>Cantidad insuficiente:</b> "+bad.join(" · ")+
+    "<span>Se emitirá de todas formas; esa línea quedará en 0.</span>";
   el.hidden = false;
 }
 
@@ -1086,10 +1502,15 @@ function collectDoc(){
   }
   return items;
 }
+function collectDisc(){
+  const v = Math.max(0, parseFloat($("#dDisc").value)||0);
+  return v>0 ? {type:discType, value:v} : undefined;
+}
 
 $("#btnSaveDoc").addEventListener("click",()=>{
   const client = $("#dClient").value.trim();
   const items = collectDoc();
+  const disc = collectDisc();
   let ok = true;
   if(!client){ showErr("dClient","eClient"); ok=false; } else clearErr("dClient","eClient");
   if(!items.length){ $("#eLines").classList.add("on"); ok=false; } else $("#eLines").classList.remove("on");
@@ -1097,11 +1518,13 @@ $("#btnSaveDoc").addEventListener("click",()=>{
 
   if(docMode==="quote"){
     const q = {id:uid(), folio:nextFolio("q"), client, date:Date.now(), items};
+    if(disc) q.disc = disc;
     S.quotes.unshift(q); save(); renderAll(); closeSheet();
     toast(q.folio+" guardada para "+client);
     go("cotizaciones");
   }else{
-    const inv = {id:uid(), folio:nextFolio("i"), client, date:Date.now(), status:"PENDIENTE", items};
+    const inv = {id:uid(), folio:nextFolio("i"), client, date:Date.now(), status:"PENDIENTE", items, payments:[]};
+    if(disc) inv.disc = disc;
     applyStock(items, -1);
     S.invoices.unshift(inv); save(); renderAll(); closeSheet();
     toast(inv.folio+" emitida · "+money(total(inv)));
@@ -1114,18 +1537,19 @@ function convertQuote(id){
   const idx = S.quotes.findIndex(q=>q.id===id);
   if(idx<0) return;
   const q = S.quotes[idx];
-  const inv = {id:uid(), folio:nextFolio("i"), client:q.client, date:Date.now(), status:"PENDIENTE", items:q.items};
+  const inv = {id:uid(), folio:nextFolio("i"), client:q.client, date:Date.now(), status:"PENDIENTE", items:q.items, payments:[]};
+  if(q.disc) inv.disc = q.disc;
   S.quotes.splice(idx,1);
   S.invoices.unshift(inv);
   applyStock(q.items, -1);
   save(); renderAll(); go("facturacion");
-  toast(inv.folio+" creada desde "+q.folio+" · stock descontado", "Deshacer", ()=>{
+  toast(inv.folio+" creada desde "+q.folio+" · cantidad descontada", "Deshacer", ()=>{
     const j = S.invoices.findIndex(x=>x.id===inv.id);
     if(j>=0) S.invoices.splice(j,1);
     S.quotes.splice(idx,0,q);
     applyStock(q.items, +1);
     save(); renderAll();
-    toast("Conversión revertida · stock devuelto");
+    toast("Conversión revertida · cantidad devuelta");
   });
 }
 
@@ -1145,7 +1569,7 @@ function deleteDoc(kind,id){
   const [rm] = arr.splice(idx,1);
   if(kind==="i") applyStock(rm.items, +1);
   save(); renderAll();
-  toast(rm.folio+" eliminada"+(kind==="i"?" · stock devuelto":""), "Deshacer", ()=>{
+  toast(rm.folio+" eliminada"+(kind==="i"?" · cantidad devuelta":""), "Deshacer", ()=>{
     arr.splice(idx,0,rm);
     if(kind==="i") applyStock(rm.items, -1);
     save(); renderAll(); toast("Restaurada");
@@ -1157,8 +1581,14 @@ function renderAll(){
   renderProducts();
   renderQuotes();
   renderInvoices();
+  renderCobrar();
+  renderPagar();
+  renderUsers();
   $("#cQuote").textContent = S.quotes.length;
   $("#cInv").textContent = S.invoices.length;
+  $("#cCobrar").textContent = S.invoices.filter(i=>saldoOf(i)>0).length;
+  $("#cPagar").textContent = S.payables.filter(p=>saldoPay(p)>0).length;
+  $("#cUsers").textContent = S.users.length;
 }
 
 function renderQuotes(){
@@ -1176,7 +1606,7 @@ function renderQuotes(){
         <div class="doc-name">${esc(q.client)}</div>
         <div class="doc-date">${dateFmt(q.date)} · ${q.items.length} producto${q.items.length>1?"s":""}</div>
       </div>
-      <div class="doc-total">${money(total(q))}</div>
+      <div class="doc-total">${money(total(q))}${discAmt(q)>0?`<small>antes ${money(subtotal(q))}</small>`:""}</div>
       <div class="doc-actions">
         <button class="btn btn-primary btn-sm" data-conv="${q.id}">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
@@ -1194,7 +1624,7 @@ function renderQuotes(){
 function renderInvoices(){
   const invs = S.invoices;
   $("#sInvCount").textContent = invs.length;
-  $("#sOwed").textContent = money(invs.filter(i=>i.status!=="PAGADA").reduce((a,i)=>a+total(i),0));
+  $("#sOwed").textContent = money(invs.reduce((a,i)=>a+saldoOf(i),0));
   $("#sPaid").textContent = money(invs.filter(i=>i.status==="PAGADA").reduce((a,i)=>a+total(i),0));
   const el = $("#listInvoices");
   if(!invs.length){
@@ -1206,9 +1636,9 @@ function renderInvoices(){
       <div class="doc-main">
         <div class="doc-folio">${inv.folio}</div>
         <div class="doc-name">${esc(inv.client)}</div>
-        <div class="doc-date">${dateFmt(inv.date)} · ${inv.items.length} producto${inv.items.length>1?"s":""}</div>
+        <div class="doc-date">${dateFmt(inv.date)} · ${inv.items.length} producto${inv.items.length>1?"s":""}${paySum(inv.payments)>0?` · abonado ${money(paySum(inv.payments))}`:""}</div>
       </div>
-      <div class="doc-total">${money(total(inv))}</div>
+      <div class="doc-total">${money(total(inv))}${discAmt(inv)>0?`<small>antes ${money(subtotal(inv))}</small>`:""}</div>
       <div class="doc-actions">
         <button class="status ${inv.status==="PAGADA"?"paid":"pending"}" data-st="${inv.id}" title="Cambiar estado" style="cursor:pointer">
           [ ${inv.status} ]
@@ -1231,7 +1661,6 @@ function renderInvoices(){
 function viewInvoice(id){
   const inv = S.invoices.find(x=>x.id===id); if(!inv) return;
   $("#prtTitle").textContent = "Factura "+inv.folio;
-  const sub = total(inv);
   $("#paper").innerHTML = `
     <div class="paper-head">
       <div class="paper-brand">
@@ -1255,9 +1684,10 @@ function viewInvoice(id){
       </tbody>
     </table>
     <div class="paper-sums">
-      <div><span>Subtotal</span><span>${money(sub)}</span></div>
+      <div><span>Subtotal</span><span>${money(subtotal(inv))}</span></div>
+      ${discAmt(inv)>0?`<div><span>Descuento</span><span>–${money(discAmt(inv))}</span></div>`:""}
       <div><span>IVA (0%)</span><span>${money(0)}</span></div>
-      <div class="grand"><span>TOTAL</span><span>${money(sub)}</span></div>
+      <div class="grand"><span>TOTAL</span><span>${money(total(inv))}</span></div>
     </div>
     <div class="paper-foot">
       <span>Gracias por su preferencia · JTAS Hydraulic Hose</span>
@@ -1271,6 +1701,279 @@ $("#btnPrint").addEventListener("click",()=>window.print());
 function esc(s){ return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function showErr(inp,err){ $("#"+inp).classList.add("err"); $("#"+err).classList.add("on"); }
 function clearErr(inp,err){ $("#"+inp).classList.remove("err"); $("#"+err).classList.remove("on"); }
+
+/* ================= CUENTAS POR COBRAR ================= */
+let showAllCobrar = false;
+$("#btnCobrarToggle").addEventListener("click", ()=>{
+  showAllCobrar = !showAllCobrar;
+  $("#btnCobrarToggle").textContent = showAllCobrar ? "Ver pendientes" : "Ver todas";
+  renderCobrar();
+});
+function renderCobrar(){
+  const pend = S.invoices.filter(i=>saldoOf(i)>0);
+  const saldoT = round2(pend.reduce((a,i)=>a+saldoOf(i),0));
+  const cobrado = round2(
+    S.invoices.filter(i=>i.status==="PAGADA").reduce((a,i)=>a+total(i),0) +
+    S.invoices.filter(i=>i.status!=="PAGADA").reduce((a,i)=>a+paySum(i.payments),0)
+  );
+  $("#sCobrar").textContent = money(saldoT);
+  $("#sCobrarN").textContent = pend.length;
+  $("#sCobrado").textContent = money(cobrado);
+  const list = showAllCobrar ? S.invoices : pend;
+  const el = $("#listCobrar");
+  if(!list.length){
+    el.innerHTML = `<div class="empty"><div class="empty-ico">💰</div><b>${showAllCobrar?"Sin facturas":"Nada por cobrar"}</b>${showAllCobrar?"Aún no se han emitido facturas.":"Todas las facturas están saldadas."}</div>`;
+    return;
+  }
+  el.innerHTML = list.map((inv,i)=>{
+    const s = saldoOf(inv);
+    return `
+    <div class="doc" style="--i:${i}">
+      <div class="doc-main">
+        <div class="doc-folio">${inv.folio}</div>
+        <div class="doc-name">${esc(inv.client)}</div>
+        <div class="doc-date">${dateFmt(inv.date)}${paySum(inv.payments)>0?` · abonado ${money(paySum(inv.payments))}`:""}</div>
+      </div>
+      <div class="doc-total">${money(s>0?s:total(inv))}<small class="${s>0?"saldo":""}">${s>0?"saldo pendiente":"pagado"}</small></div>
+      <div class="doc-actions">
+        ${s>0?`<button class="btn btn-primary btn-sm" data-ab="${inv.id}">Abonar</button>`:""}
+        <button class="btn btn-ghost btn-sm" data-vc="${inv.id}">Ver</button>
+      </div>
+    </div>`;}).join("");
+  el.querySelectorAll("[data-ab]").forEach(b=>b.onclick=()=>openPay("invoice",b.dataset.ab));
+  el.querySelectorAll("[data-vc]").forEach(b=>b.onclick=()=>viewInvoice(b.dataset.vc));
+}
+
+/* ================= CUENTAS POR PAGAR ================= */
+let showAllPagar = false;
+$("#btnPagarToggle").addEventListener("click", ()=>{
+  showAllPagar = !showAllPagar;
+  $("#btnPagarToggle").textContent = showAllPagar ? "Ver pendientes" : "Ver todas";
+  renderPagar();
+});
+function renderPagar(){
+  const pend = S.payables.filter(p=>saldoPay(p)>0);
+  const saldoT = round2(pend.reduce((a,p)=>a+saldoPay(p),0));
+  const pagado = round2(
+    S.payables.filter(p=>p.status==="PAGADA").reduce((a,p)=>a+(+p.total||0),0) +
+    S.payables.filter(p=>p.status!=="PAGADA").reduce((a,p)=>a+paySum(p.payments),0)
+  );
+  $("#sPagar").textContent = money(saldoT);
+  $("#sPagarN").textContent = pend.length;
+  $("#sPagado").textContent = money(pagado);
+  const list = showAllPagar ? S.payables : pend;
+  const el = $("#listPagar");
+  if(!list.length){
+    el.innerHTML = `<div class="empty"><div class="empty-ico">🧾</div><b>${showAllPagar?"Sin cuentas":"Nada por pagar"}</b>${showAllPagar?"Registra tu primera deuda con “Agregar Cuenta”.":"Todas las cuentas están saldadas."}</div>`;
+    return;
+  }
+  el.innerHTML = list.map((p,i)=>{
+    const s = saldoPay(p);
+    return `
+    <div class="doc" style="--i:${i}">
+      <div class="doc-main">
+        <div class="doc-name">${esc(p.provider)}</div>
+        <div class="doc-date">${esc(p.concept)} · ${dateFmt(p.date)}${paySum(p.payments)>0?` · abonado ${money(paySum(p.payments))}`:""}</div>
+      </div>
+      <div class="doc-total">${money(s>0?s:(+p.total||0))}<small class="${s>0?"saldo":""}">${s>0?"saldo pendiente":"pagado"}</small></div>
+      <div class="doc-actions">
+        <button class="status ${p.status==="PAGADA"?"paid":"pending"}" data-sp="${p.id}" title="Cambiar estado" style="cursor:pointer">[ ${p.status} ]</button>
+        ${s>0?`<button class="btn btn-primary btn-sm" data-abp="${p.id}">Abonar</button>`:""}
+        <button class="icon-btn danger" data-dp="${p.id}" aria-label="Eliminar">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        </button>
+      </div>
+    </div>`;}).join("");
+  el.querySelectorAll("[data-sp]").forEach(b=>b.onclick=()=>togglePayable(b.dataset.sp));
+  el.querySelectorAll("[data-abp]").forEach(b=>b.onclick=()=>openPay("payable",b.dataset.abp));
+  el.querySelectorAll("[data-dp]").forEach(b=>b.onclick=()=>deletePayable(b.dataset.dp));
+}
+function togglePayable(id){
+  const p = S.payables.find(x=>x.id===id); if(!p) return;
+  p.status = p.status==="PAGADA" ? "PENDIENTE" : "PAGADA";
+  save(); renderAll();
+  toast(p.provider+" · "+(p.status==="PAGADA"?"cuenta pagada":"cuenta pendiente"), null, null, p.status!=="PAGADA");
+}
+function deletePayable(id){
+  const idx = S.payables.findIndex(p=>p.id===id); if(idx<0) return;
+  const [rm] = S.payables.splice(idx,1);
+  save(); renderAll();
+  toast("Cuenta de "+rm.provider+" eliminada", "Deshacer", ()=>{
+    S.payables.splice(idx,0,rm); save(); renderAll(); toast("Cuenta restaurada");
+  }, true);
+}
+function openPayable(){
+  $("#spayTitle").textContent = "Agregar Cuenta por Pagar";
+  $("#pProv").value=""; $("#pConcept").value=""; $("#pTotal").value="";
+  $("#pDate").value = new Date().toISOString().slice(0,10);
+  clearErr("pProv","eProv"); clearErr("pConcept","eConcept"); clearErr("pTotal","ePTotal");
+  openSheet($("#sheetPayable"));
+}
+$("#btnNewPayable").addEventListener("click", openPayable);
+$("#btnSavePayable").addEventListener("click", ()=>{
+  const prov = $("#pProv").value.trim();
+  const concept = $("#pConcept").value.trim();
+  const t = parseFloat($("#pTotal").value);
+  let ok = true;
+  if(!prov){ showErr("pProv","eProv"); ok=false; } else clearErr("pProv","eProv");
+  if(!concept){ showErr("pConcept","eConcept"); ok=false; } else clearErr("pConcept","eConcept");
+  if(!(t>0)){ showErr("pTotal","ePTotal"); ok=false; } else clearErr("pTotal","ePTotal");
+  if(!ok) return;
+  const date = $("#pDate").value ? Date.parse($("#pDate").value+"T12:00:00") : Date.now();
+  S.payables.unshift({id:uid(), provider:prov, concept, date, total:round2(t), status:"PENDIENTE", payments:[]});
+  save(); renderAll(); closeSheet();
+  toast("Cuenta por pagar registrada · "+money(t));
+  go("pagar");
+});
+
+/* ---- abono genérico (cobrar / pagar) ---- */
+let payCtx = null;
+function getPayObj(){
+  if(!payCtx) return null;
+  return payCtx.kind==="invoice" ? S.invoices.find(x=>x.id===payCtx.id) : S.payables.find(x=>x.id===payCtx.id);
+}
+function openPay(kind, id){
+  payCtx = {kind, id};
+  const o = getPayObj(); if(!o) return;
+  const s = kind==="invoice" ? saldoOf(o) : saldoPay(o);
+  $("#payTitle").textContent = kind==="invoice" ? "Abono a "+o.folio : "Abono · "+o.provider;
+  $("#payHint").innerHTML = "Saldo actual: <b style=\"color:#FFB370\">"+money(s)+
+    "</b><br>Si el abono cubre todo el saldo, la cuenta se marcará como PAGADA.";
+  $("#payAmt").value = "";
+  clearErr("payAmt","ePay");
+  openSheet($("#sheetPayment"));
+}
+$("#btnPaySave").addEventListener("click", ()=>{
+  const o = getPayObj(); if(!o){ closeSheet(); return; }
+  const amt = parseFloat($("#payAmt").value);
+  if(!(amt>0)){ showErr("payAmt","ePay"); return; }
+  clearErr("payAmt","ePay");
+  o.payments = o.payments || [];
+  o.payments.push({amount:round2(amt), date:Date.now()});
+  const s = payCtx.kind==="invoice" ? saldoOf(o) : saldoPay(o);
+  if(s<=0) o.status = "PAGADA";
+  save(); renderAll(); closeSheet();
+  toast("Abono de "+money(amt)+" registrado · saldo "+money(Math.max(0,s)));
+});
+
+/* ================= USUARIOS ================= */
+let editingUid = null, roleSeg = "vendedor";
+$$("#segRole button").forEach(b=>b.addEventListener("click",()=>{
+  roleSeg = b.dataset.val;
+  $("#segRole").dataset.v = roleSeg;
+  $$("#segRole button").forEach(x=>x.classList.toggle("on", x===b));
+  $("#roleHint").textContent = ROLE_HINT[roleSeg];
+}));
+function renderUsers(){
+  const tb = $("#tbodyUsers");
+  tb.innerHTML = S.users.map((u,i)=>`
+    <tr style="--i:${i}">
+      <td><span class="name">${esc(u.name)}</span></td>
+      <td><span class="code">${esc(u.user)}</span></td>
+      <td><span class="role-chip ${u.role}">${ROLE_LABEL[u.role]||u.role}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn" data-eu="${u.id}" title="Editar" aria-label="Editar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+          </button>
+          <button class="icon-btn danger" data-du="${u.id}" title="Eliminar" aria-label="Eliminar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </td>
+    </tr>`).join("");
+  $("#emptyUsers").hidden = S.users.length>0;
+  tb.querySelectorAll("[data-eu]").forEach(b=>b.onclick=()=>openUser(b.dataset.eu));
+  tb.querySelectorAll("[data-du]").forEach(b=>b.onclick=()=>deleteUser(b.dataset.du));
+}
+function openUser(id){
+  editingUid = id || null;
+  const u = id ? S.users.find(x=>x.id===id) : null;
+  $("#suTitle").textContent = u ? "Editar Usuario" : "Agregar Usuario";
+  $("#uName").value = u?u.name:"";
+  $("#uUser").value = u?u.user:"";
+  $("#uPass").value = "";
+  roleSeg = u?u.role:"vendedor";
+  $("#segRole").dataset.v = roleSeg;
+  $$("#segRole button").forEach(x=>x.classList.toggle("on", x.dataset.val===roleSeg));
+  $("#roleHint").textContent = ROLE_HINT[roleSeg];
+  clearErr("uName","euName"); clearErr("uUser","euUser"); clearErr("uPass","euPass");
+  openSheet($("#sheetUser"));
+}
+$("#btnAddUser").addEventListener("click",()=>openUser(null));
+$("#btnSaveUser").addEventListener("click", ()=>{
+  const name = $("#uName").value.trim();
+  const user = $("#uUser").value.trim();
+  const pass = $("#uPass").value;
+  let ok = true;
+  if(!name){ showErr("uName","euName"); ok=false; } else clearErr("uName","euName");
+  if(user.length<3){ showErr("uUser","euUser"); ok=false; } else clearErr("uUser","euUser");
+  const creating = !editingUid;
+  if((creating && pass.length<4) || (!creating && pass && pass.length<4)){ showErr("uPass","euPass"); ok=false; }
+  else clearErr("uPass","euPass");
+  if(ok && S.users.some(x=>(x.user||"").toLowerCase()===user.toLowerCase() && x.id!==editingUid)){
+    toast("Ese nombre de usuario ya existe", null, null, true);
+    ok = false;
+  }
+  if(!ok) return;
+
+  if(creating){
+    S.users.push({id:uid(), name, user, pass, role:roleSeg});
+    toast("Usuario "+user+" creado · "+(ROLE_LABEL[roleSeg]||roleSeg));
+  }else{
+    const u = S.users.find(x=>x.id===editingUid);
+    u.name = name; u.user = user; u.role = roleSeg;
+    if(pass) u.pass = pass;
+    if(me && u.id===me.id){ me = u; applyRole(); }
+    toast("Usuario actualizado");
+  }
+  save(); renderAll(); closeSheet();
+});
+function deleteUser(id){
+  const u = S.users.find(x=>x.id===id); if(!u) return;
+  if(me && u.id===me.id){ toast("No puedes eliminar tu propia cuenta", null, null, true); return; }
+  if(u.role==="admin" && S.users.filter(x=>x.role==="admin").length<=1){
+    toast("Debe existir al menos un administrador", null, null, true); return;
+  }
+  const idx = S.users.indexOf(u);
+  S.users.splice(idx,1);
+  save(); renderAll();
+  toast("Usuario "+u.user+" eliminado", "Deshacer", ()=>{
+    S.users.splice(idx,0,u); save(); renderAll(); toast("Usuario restaurado");
+  }, true);
+}
+
+/* ================= LOGIN / SESIÓN ================= */
+const SESSION_KEY = "jtas_session_v1";
+function showLogin(){ $("#loginScreen").classList.add("on"); setTimeout(()=>$("#lUser").focus({preventScroll:true}),300); }
+function hideLogin(){ $("#loginScreen").classList.remove("on"); }
+function tryLogin(){
+  const u = $("#lUser").value.trim().toLowerCase(), p = $("#lPass").value;
+  const found = S.users.find(x=>(x.user||"").toLowerCase()===u && x.pass===p);
+  if(!found){
+    const e = $("#lErr");
+    e.classList.remove("on"); void e.offsetWidth; e.classList.add("on");
+    return;
+  }
+  me = found;
+  try{ localStorage.setItem(SESSION_KEY, found.id); }catch(_){}
+  $("#lErr").classList.remove("on");
+  $("#lPass").value = "";
+  hideLogin();
+  applyRole();
+  toast("Bienvenido, "+found.name);
+}
+function logout(){
+  me = null;
+  try{ localStorage.removeItem(SESSION_KEY); }catch(_){}
+  $("#lPass").value = "";
+  $("#userChip").hidden = true;
+  showLogin();
+}
+$("#btnLogin").addEventListener("click", tryLogin);
+$("#lPass").addEventListener("keydown", e=>{ if(e.key==="Enter") tryLogin(); });
+$("#lUser").addEventListener("keydown", e=>{ if(e.key==="Enter") $("#lPass").focus(); });
+$("#btnLogout").addEventListener("click", logout);
 
 /* ================= DATOS: backup / import / reset ================= */
 $("#btnExport").addEventListener("click", ()=>{
@@ -1298,6 +2001,8 @@ $("#fileImport").addEventListener("change", e=>{
       S = d;
       S.quotes = Array.isArray(S.quotes) ? S.quotes : [];
       S.invoices = Array.isArray(S.invoices) ? S.invoices : [];
+      S.payables = Array.isArray(S.payables) ? S.payables : [];
+      S.users = (Array.isArray(S.users) && S.users.length) ? S.users : defaultUsers();
       S.seq = S.seq || {q:0, i:0};
       save(); renderAll();
       toast("Backup importado · " + S.products.length + " productos");
@@ -1311,7 +2016,12 @@ $("#btnReset").addEventListener("click", ()=>{
   const b = $("#btnReset");
   if(Date.now() - resetArmed < 3000){
     resetArmed = 0; b.textContent = "Restablecer";
-    S = seed(); save(); renderAll();
+    S = seed(); save();
+    if(me){
+      me = S.users.find(u=>u.id===me.id) || null;
+      if(me) applyRole(); else showLogin();
+    }
+    renderAll();
     toast("Datos de ejemplo restaurados");
   }else{
     resetArmed = Date.now(); b.textContent = "¿Seguro? pulsa otra vez";
@@ -1322,7 +2032,7 @@ $("#btnReset").addEventListener("click", ()=>{
 });
 
 /* ================= DEEP-LINK #vista ================= */
-const VIEWS = ["inventario","cotizaciones","facturacion"];
+const VIEWS = ["inventario","cotizaciones","facturacion","cobrar","pagar","usuarios"];
 function syncHash(view){
   try{ history.replaceState(null, "", "#"+view); }
   catch(e){ try{ location.hash = view; }catch(_){} }
@@ -1333,8 +2043,17 @@ window.addEventListener("hashchange", ()=>{
 });
 
 renderAll();
-const initial = location.hash.replace("#","");
-if(VIEWS.includes(initial)) go(initial); else syncHash("inventario");
+try{
+  const sid = localStorage.getItem(SESSION_KEY);
+  me = S.users.find(u=>u.id===sid) || null;
+}catch(_){ me = null; }
+if(me){ hideLogin(); applyRole(); }
+else{
+  $("#userChip").hidden = true;
+  const initial = location.hash.replace("#","");
+  if(VIEWS.includes(initial)) syncHash(initial);
+  showLogin();
+}
 </script>
 </body>
 </html>
