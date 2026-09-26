@@ -1,0 +1,12 @@
+{
+  "name": "jtas-hydraulic-hose",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sistema de gestion JTAS Hydraulic Hose - inventario, cotizaciones, facturacion",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
